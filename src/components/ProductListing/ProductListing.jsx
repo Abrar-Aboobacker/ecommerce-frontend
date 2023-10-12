@@ -5,14 +5,12 @@ import {
   CardActionArea,
   CardActions,
   CardContent,
-  CardMedia,
   Modal,
   TextField,
   Typography,
   styled,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import banner from "../../Assets/Banner1.jpg";
 import SearchIcon from "@mui/icons-material/Search";
 import { useFormik } from "formik";
 import { productSchema } from "../../validation/productValidation";
@@ -20,6 +18,7 @@ import toast from "react-hot-toast";
 import axios from "../../axios/axios";
 import Pagination from "./Pagination";
 import { baseURL } from "../../constants/constant";
+import { Link } from "react-router-dom";
 
 const StyledModal = styled(Modal)({
   display: "flex",
@@ -28,7 +27,6 @@ const StyledModal = styled(Modal)({
 });
 const ProductListing = () => {
   const [open, setOpen] = useState(false);
-  const [hovered, setHovered] = useState(false); 
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(6);
@@ -38,15 +36,12 @@ const ProductListing = () => {
   };
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const filteredProduct = products.filter((product) => {
-    const matchesSearchTerm =
-    product.name.toLowerCase().includes(serachTerm.toLowerCase())
-    return  matchesSearchTerm;
+    const matchesSearchTerm = product.name
+      .toLowerCase()
+      .includes(serachTerm.toLowerCase());
+    return matchesSearchTerm;
   });
 
-  // const currentProducts = filteredProduct.slice(
-  //   (currentPage - 1) * postsPerPage,
-  //   currentPage * postsPerPage
-  // );
 
   const handleSearchTermChange = (event) => {
     setSearchTerm(event.target.value);
@@ -99,14 +94,16 @@ const ProductListing = () => {
         console.log(error);
         helpers.setErrors({ submit: error.message });
         toast.error("Please login");
-        // navigate('/login')
       }
     },
   });
   const totalProducts = filteredProduct.length;
   const indexOfLastProduct = currentPage * postsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - postsPerPage;
-  const currentProducts = filteredProduct.slice(indexOfFirstProduct, indexOfLastProduct);
+  const currentProducts = filteredProduct.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
   return (
     <>
       <Box
@@ -115,7 +112,7 @@ const ProductListing = () => {
           justifyContent: "center",
           alignItems: "center",
           marginTop: 3,
-          mb:3
+          mb: 3,
         }}
       >
         <Button
@@ -239,13 +236,11 @@ const ProductListing = () => {
                 color="inherit"
                 type="submit"
                 name="submit"
-                onClick={()=>{
-                  formik.handleSubmit()
+                onClick={() => {
+                  formik.handleSubmit();
 
                   setOpen(false);
-                }
-                 
-                }
+                }}
               >
                 Submit
               </Button>
@@ -284,79 +279,77 @@ const ProductListing = () => {
             gap: 5,
           }}
         >
-          {currentProducts.map((value)=>(
-
           
-          <Card
-            elevation={2}
-            sx={{
-              width: { xs: "95%", sm: 350 },
-              mt: { xs: 10 },
-              maxWidth: 400,
-            }}
-          >
-            <CardActionArea>
-              {/* <CardMedia
-                component="img"
-                height="140"
-                image={value.image[0]}
-                alt="green iguana"
-                style={{ objectFit: "cover", width: "100%", height: "100%" }}
-              /> */}
-               <img
-                              src={ `${baseURL}${value?.image[0]}` } 
-                              alt=""
-                              style={{ objectFit: "cover", width: "100%", height: "100%" }}
-                            />
-              <CardContent>
-                <Typography
-                  gutterBottom
-                  variant="h6"
-                  sx={{ textAlign: "center", fontWeight: 600, fontSize: 25 }}
-                >
-                  {value.name}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  textAlign={"center"}
-                >
-                  Lizards are a widespread group of squamate reptiles, with over
-                  6,000 species, ranging across all continents except Antarctica
-                </Typography>
-              
-                  <Typography sx={{mt:2}} textAlign={'center'}>Qantity: <span style={{fontWeight:600}}>{value.quantity}</span></Typography>
-                 
-                    <Typography sx={{mt:2}} textAlign={'center'}>Price: <span style={{fontWeight:600}}>{value.price}</span></Typography>
-                  
-                
-              </CardContent>
-            </CardActionArea>
-            <CardActions></CardActions>
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
-              <Button size="small" color="primary">
-                Share
-              </Button>
-            </Box>
-          </Card>
+          {currentProducts.map((value) => (
+          
+            <Card
+              elevation={2}
+              sx={{
+                width: { xs: "95%", sm: 350 },
+                mt: { xs: 10 },
+                maxWidth: 400,
+              }}
+            >
+              <CardActionArea>
+                <img
+                  src={`${baseURL}${value?.image[0]}`}
+                  alt=""
+                  style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                />
+                <CardContent>
+                  <Typography
+                    gutterBottom
+                    variant="h6"
+                    sx={{ textAlign: "center", fontWeight: 600, fontSize: 25 }}
+                  >
+                    {value.name}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    textAlign={"center"}
+                  >
+                   {value.discription}
+                  </Typography>
 
-           ))}  
+                  <Typography sx={{ mt: 2 }} textAlign={"center"}>
+                    Qantity:{" "}
+                    <span style={{ fontWeight: 600 }}>{value.quantity}</span>
+                  </Typography>
+
+                  <Typography sx={{ mt: 2 }} textAlign={"center"}>
+                    Price:{" "}
+                    <span style={{ fontWeight: 600 }}>{value.price}</span>
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+              <CardActions></CardActions>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <Link to={`/products/${value._id}`}>
+                <Button size="small" color="primary">
+                  More details
+                </Button>
+                </Link>
+              </Box>
+            </Card>
+            
+          ))}
         </Box>
       ) : (
         <Box>
           <Typography fontWeight={400} variant="h6" textAlign={"center"}>
-            Currently there is No products  add products
+            Currently there is No products add products
           </Typography>
         </Box>
       )}
       <Box sx={{ display: "flex", justifyContent: "center" }}>
-  <Pagination
-    postsPerPage={postsPerPage}
-    totalPosts={totalProducts}
-    paginate={paginate}
-    currentPage={currentPage}
-  />
-</Box>
+        <Pagination
+          postsPerPage={postsPerPage}
+          totalPosts={totalProducts}
+          paginate={paginate}
+          currentPage={currentPage}
+        />
+      </Box>
     </>
   );
 };
